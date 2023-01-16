@@ -41,19 +41,19 @@ module RedmineWorkflowHiddenFields
 							next
 						end
 					end
-					strings << show_detail(detail, no_html, options)						
+					strings << show_detail(detail, no_html, options)
 				end
 			end
 			if values_by_field.present?
 				values_by_field.each do |field, changes|
-					unless details.first.journal.issue.hidden_attribute?(field.id.to_s, options[:user])						
+					unless details.first.journal.issue.hidden_attribute?(field.id.to_s, options[:user])
 						if changes[:added].any?
-							detail = MultipleValuesDetail.new('cf', field.id.to_s, field)
+							detail = IssuesHelper::MultipleValuesDetail.new('cf', field.id.to_s, field)
 							detail.value = changes[:added]
 							strings << show_detail(detail, no_html, options)
 						end
 						if changes[:deleted].any?
-							detail = MultipleValuesDetail.new('cf', field.id.to_s, field)
+							detail = IssuesHelper::MultipleValuesDetail.new('cf', field.id.to_s, field)
 							detail.old_value = changes[:deleted]
 							strings << show_detail(detail, no_html, options)
 						end
