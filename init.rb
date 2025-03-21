@@ -1,6 +1,6 @@
 require 'redmine'
 
-Rails.configuration.to_prepare do
+RedmineApp::Application.config.after_initialize do
 #ActiveSupport::Reloader.to_prepare do
   require_dependency 'issue'
   Issue.send(:prepend, RedmineWorkflowHiddenFields::IssuePatch)
