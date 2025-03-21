@@ -24,44 +24,34 @@ module RedmineWorkflowHiddenFields
 
 		def available_block_columns
 			available_and_visible_columns.reject(&:inline?)
-		end  
-	
-		def columns
-			super.reject{|col| col.respond_to?(:custom_field) ? completely_hidden_fields.include?(col.custom_field.id.to_s) : completely_hidden_fields.include?(col.name)}				
 		end
-		
-		def available_filters	  
+
+		def columns
+			super.reject{|col| col.respond_to?(:custom_field) ? completely_hidden_fields.include?(col.custom_field.id.to_s) : completely_hidden_fields.include?(col.name)}
+		end
+
+		def available_filters
 			unless @available_filters
 				super
 				completely_hidden_fields.each {|field|
 					@available_filters.delete field
-				}					
+				}
 			end
-			@available_filters				
+			@available_filters
 		end
 
-		def completely_hidden_fields 
-			unless @completely_hidden_fields  
-				if project != nil 
-					@completely_hidden_fields = project.completely_hidden_attribute_names 
-				else 
-					@completely_hidden_fields = [] 
-					usr = User.current; 
+		def completely_hidden_fields
+			unless @completely_hidden_fields
+				if project != nil
+					@completely_hidden_fields = project.completely_hidden_attribute_names
+				else
+					@completely_hidden_fields = []
+					usr = User.current;
 					first = true
-					all_projects.each { |prj|
-						if usr.roles_for_project(prj).count > 0 
-							if first 
-								@completely_hidden_fields = prj.completely_hidden_attribute_names(usr) 
-							else 
-								@completely_hidden_fields &= prj.completely_hidden_attribute_names(usr) 
-							end 
-							return @completely_hidden_fields if @completely_hidden_fields.empty? 
-							first = false 								
-						end 
-					} 
+					@completely_hidden_fields = HiddenAttributeNamesForUser.where(user_id: usr.id, project_id: all_projects.pluck(:id)).pluck(:name).map{ |r| r.split(';')}.flatten.uniq
 				end
-			end				
-			return @completely_hidden_fields 
+			end
+			return @completely_hidden_fields
 		end
 
 		# Adds a filter for the given custom field
